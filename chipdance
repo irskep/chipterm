@@ -8577,6 +8577,10 @@ RU5ErkJggg==
 global i
 i = 0
 
+# cheap workaround for incorrect scrollback behavior when zoomed and on
+# first line: just move to second line.
+print
+
 try:
     while True:
         i = i % len(IMAGES)
