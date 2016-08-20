@@ -8585,6 +8585,17 @@ RU5ErkJggg==
 ]
 
 
+def _scrollback():
+    try:
+        sys.stdout.write("\033[" + os.environ["CHIPDANCE_HEIGHT"] + "A")
+    except KeyError:
+        sys.stdout.write("\033[18A")
+
+
+def stop_chipdance():
+    _scrollback()
+
+
 def chipdance():
     """
     Make a Chippy image dance in the terminal. Returns a function to stop it.
@@ -8593,28 +8604,19 @@ def chipdance():
     if not is_iterm2v3:
         return False
 
-    # workaround: if current line is last line of iTerm window, s/u escape
-    # sequences break unless we "prime" the cursor position
-    print
-    sys.stdout.write("\033[30A")
-
     i = 0
-    should_stop = [False]
 
     try:
-        while not should_stop[0]:
+        while True:
             i = i % len(IMAGES)
-            sys.stdout.write("\033[s")
             sys.stdout.write(IMAGES[i])
-            sys.stdout.write("\033[u")
+            _scrollback()
             time.sleep(0.06)
             i += 1
     except KeyboardInterrupt:
-        sys.stdout.write("\033[u")
+        stop_chipdance()
 
-    def stop():
-        should_stop[0] = True
-    return stop
+    return True
 
 
 if __name__ == '__main__':
