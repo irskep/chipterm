@@ -2,6 +2,16 @@
 import sys
 import time
 
+is_iterm2v3 = False
+
+try:
+    import os
+    from distutils.version import StrictVersion
+    if os.environ["TERM_PROGRAM"] == "iTerm.app" and StrictVersion(os.environ["TERM_PROGRAM_VERSION"]) >= StrictVersion("3.0.0"):
+        is_iterm2v3 = True
+except:
+    pass
+
 IMAGES = [
 """]1337;File=name=aW1hZ2VzL2hpcG11bmstYW5pbWF0ZWQtMC5wbmc=;size=40846;inline=1:iVBORw0KGgoAAAANSUhEUgAAAWkAAAFmCAYAAACvLWubAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJ
 bWFnZVJlYWR5ccllPAAAA3BpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdp
@@ -8576,10 +8586,23 @@ RU5ErkJggg==
 
 
 def chipdance():
+    """
+    Make a Chippy image dance in the terminal. Returns a function to stop it.
+    If not using iTerm2 v3+, do nothing and return False.
+    """
+    if not is_iterm2v3:
+        return False
+
+    # workaround: if current line is last line of iTerm window, s/u escape
+    # sequences break unless we "prime" the cursor position
+    print
+    sys.stdout.write("\033[30A")
+
     i = 0
+    should_stop = [False]
 
     try:
-        while True:
+        while not should_stop[0]:
             i = i % len(IMAGES)
             sys.stdout.write("\033[s")
             sys.stdout.write(IMAGES[i])
@@ -8589,6 +8612,11 @@ def chipdance():
     except KeyboardInterrupt:
         sys.stdout.write("\033[u")
 
+    def stop():
+        should_stop[0] = True
+    return stop
+
 
 if __name__ == '__main__':
-    chipdance()
+    if not chipdance():
+        sys.stdout.write("Your terminal does not support images.\n")
