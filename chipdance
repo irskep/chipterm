@@ -8574,21 +8574,21 @@ RU5ErkJggg==
 """,
 ]
 
-global i
-i = 0
 
-# cheap workaround for incorrect scrollback behavior when zoomed and on
-# first line: just move to second line.
-print
+def chipdance():
+    i = 0
 
-try:
-    while True:
-        i = i % len(IMAGES)
-        sys.stdout.write("\033[s")
-        sys.stdout.write(IMAGES[i])
+    try:
+        while True:
+            i = i % len(IMAGES)
+            sys.stdout.write("\033[s")
+            sys.stdout.write(IMAGES[i])
+            sys.stdout.write("\033[u")
+            time.sleep(0.06)
+            i += 1
+    except KeyboardInterrupt:
         sys.stdout.write("\033[u")
-        time.sleep(0.06)
-        i += 1
-except KeyboardInterrupt:
-    sys.stdout.write("\033[u")
 
+
+if __name__ == '__main__':
+    chipdance()
